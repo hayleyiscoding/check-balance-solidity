@@ -23,9 +23,13 @@ contract YourContract {
 
     mapping(address => User) public users;
 
+    event FundsDeposited(address indexed user, uint256 amount);
+    event ProfileUpdated(address indexed user);
+
     // push user details into struct - this function accepts 2 arguments that represent the details of the user calling the smart contract and it saves them into a defined struct
     function setUserDetails(string calldata _name, uint256 _age) public {
         users[msg.sender] = (User(_name, _age));
+        emit ProfileUpdated(msg.sender);
     }
 
     // this function retrieves and returns the details saved for the user calling the contract.
@@ -42,6 +46,7 @@ contract YourContract {
         uint256 prevUserBal = balance[msg.sender];
         balance[msg.sender] = prevUserBal + _amount;
         totalAmount += _amount;
+        emit FundsDeposited(msg.sender, _amount);
     }
 
     // getBalance - I am not sure how to create this function without passing the address as a parameter? It seems I cannot use 'msg.sender' in a view function? Please advise. Thank you.
