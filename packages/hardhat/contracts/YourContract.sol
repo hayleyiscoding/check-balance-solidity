@@ -7,13 +7,13 @@ import "hardhat/console.sol";
 // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
 
 contract YourContract {
-    address public owner = 0x623bb5f303cb3285F24c2f16d5E456699DA28489;
+    address payable public owner;
     uint256 public totalAmount;
     uint256 public constant FEE = 12;
     error AmountTooSmall(uint256 _amount);
 
-    constructor() {
-        owner = msg.sender;
+    constructor() payable {
+        owner = payable(msg.sender);
     }
 
     struct User {
@@ -42,11 +42,18 @@ contract YourContract {
     mapping(address => uint256) public balance;
 
     // setBalance - is this correct? I edited it based on the feedback from the last task.
-    function deposit(uint256 _amount) public {
+    // function deposit(uint256 _amount) public {
+    //     uint256 prevUserBal = balance[msg.sender];
+    //     balance[msg.sender] = prevUserBal + _amount;
+    //     totalAmount += _amount;
+    //     emit FundsDeposited(msg.sender, _amount);
+    // }
+
+    function deposit() external payable {
         uint256 prevUserBal = balance[msg.sender];
-        balance[msg.sender] = prevUserBal + _amount;
-        totalAmount += _amount;
-        emit FundsDeposited(msg.sender, _amount);
+        balance[msg.sender] = prevUserBal + msg.value;
+        totalAmount += msg.value;
+        emit FundsDeposited(msg.sender, msg.value);
     }
 
     // getBalance - I am not sure how to create this function without passing the address as a parameter? It seems I cannot use 'msg.sender' in a view function? Please advise. Thank you.
@@ -64,15 +71,15 @@ contract YourContract {
         _;
     }
 
-    modifier hasDeposited(address user) {
-        uint256 userBalance = balance[user];
+    modifier hasDeposited() {
+        uint256 userBalance = balance[msg.sender];
         require(userBalance > 0, "not deposited");
         _;
     }
 
-    modifier isEnough(uint256 _amount) {
-        if (_amount < FEE) {
-            revert AmountTooSmall(_amount);
+    modifier isEnough() {
+        if (msg.value < FEE) {
+            revert AmountTooSmall(msg.value);
         }
         _;
     }
@@ -83,12 +90,16 @@ contract YourContract {
     }
 
     // addFunds
-    function addFund(uint256 _amount)
-        public
-        hasDeposited(msg.sender)
-        isEnough(_amount)
-    {
-        balance[msg.sender] += _amount;
-        totalAmount += _amount;
+    // function addFund(uint256 _amount)
+    //     public
+    //     hasDeposited(msg.sender)
+    //     isEnough(_amount)
+    // {
+    //     balance[msg.sender] += _amount;
+    //     totalAmount += _amount;
+    // }
+    function addFund() external payable hasDeposited isEnough {
+        balance[msg.sender] += msg.value;
+        totalAmount += msg.value;
     }
 }
