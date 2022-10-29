@@ -109,18 +109,18 @@ contract YourContract {
         emit TestFallback("Fallback function called!");
     }
 
-    function getBalance() public view returns (uint256) {
-        return address(this).balance;
-    }
+    // function getBalance() public view returns (uint256) {
+    //     return address(this).balance;
+    // }
 }
 
-contract SendToFallback {
-    function transferToFallback(address payable _receiver) public payable {
-        _receiver.transfer(msg.value);
-    }
+// contract SendToFallback {
+//     function transferToFallback(address payable _receiver) public payable {
+//         _receiver.transfer(msg.value);
+//     }
 
-    function callFallback(address payable _receiver) public payable {
-        (bool sent, ) = _receiver.call{value: msg.value}("");
-        require(sent, "Failed to send Ether");
-    }
-}
+//     function callFallback(address payable _receiver) public payable {
+//         (bool sent, ) = _receiver.call{value: msg.value}("");
+//         require(sent, "Failed to send Ether");
+//     }
+// }
